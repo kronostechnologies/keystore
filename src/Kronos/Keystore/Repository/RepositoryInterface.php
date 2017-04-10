@@ -2,6 +2,8 @@
 
 namespace Kronos\Keystore\Repository;
 
+use Kronos\Keystore\Exception\KeyNotFoundException;
+
 interface RepositoryInterface {
 	/**
 	 * @param string $key
@@ -12,6 +14,7 @@ interface RepositoryInterface {
 	/**
 	 * @param string $key
 	 * @return mixed
+	 * @throws KeyNotFoundException
 	 */
 	public function get($key);
 
@@ -19,10 +22,4 @@ interface RepositoryInterface {
 	 * @param string $key
 	 */
 	public function delete($key);
-
-	/**
-	 * @param string $key
-	 * @return bool
-	 */
-	public function exists($key);
 }
