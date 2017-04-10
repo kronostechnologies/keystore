@@ -20,6 +20,7 @@ interface RepositoryInterface {
 
 	/**
 	 * @param string $key
+	 * @throws KeyNotFoundException
 	 */
 	public function delete($key);
 }

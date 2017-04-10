@@ -38,6 +38,7 @@ class Store {
 	 * @param string $key
 	 * @param mixed $value
 	 * @param bool $encrypt
+	 * @throws EncryptionException
 	 * @throws StoreException
 	 */
 	public function set($key, $value, $encrypt=false) {
@@ -55,6 +56,7 @@ class Store {
 	 * @param $key
 	 * @param bool $decrypt
 	 * @return mixed
+	 * @throws EncryptionException
 	 * @throws KeyNotFoundException
 	 * @throws StoreException
 	 */
@@ -98,7 +100,6 @@ class Store {
 	public function exists($key) {
 		try {
 			$this->repository->get($key);
-
 			return true;
 		}
 		catch(KeyNotFoundException $exception) {
@@ -109,6 +110,12 @@ class Store {
 		}
 	}
 
+	/**
+	 * @param mixed $value
+	 * @param bool $encrypt
+	 * @return mixed
+	 * @throws EncryptionException
+	 */
 	private function encrypt($value, $encrypt) {
 		if($encrypt) {
 			if(!$this->encryptionService) {
@@ -127,6 +134,12 @@ class Store {
 		}
 	}
 
+	/**
+	 * @param mixed $value
+	 * @param bool $decrypt
+	 * @return mixed
+	 * @throws EncryptionException
+	 */
 	private function decrypt($value, $decrypt) {
 		if($decrypt) {
 			if(!$this->encryptionService) {
