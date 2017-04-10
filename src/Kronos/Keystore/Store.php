@@ -2,6 +2,7 @@
 
 namespace Kronos\Keystore;
 
+use Kronos\Keystore\Exception\EncryptionException;
 use Kronos\Keystore\Exception\KeyNotFoundException;
 use Kronos\Keystore\Exception\StoreException;
 use Kronos\Keystore\Repository\RepositoryInterface;
@@ -14,6 +15,11 @@ class Store {
 	private $repository;
 
 	/**
+	 * @var EncryptionServiceInterface
+	 */
+	private $encryptionService;
+
+	/**
 	 * Store constructor.
 	 * @param RepositoryInterface $repository
 	 */
@@ -22,13 +28,23 @@ class Store {
 	}
 
 	/**
+	 * @param EncryptionServiceInterface $encryptionService
+	 */
+	public function setEncryptionService($encryptionService) {
+		$this->encryptionService = $encryptionService;
+	}
+
+	/**
 	 * @param string $key
 	 * @param mixed $value
+	 * @param bool $encrypt
 	 * @throws StoreException
 	 */
-	public function set($key, $value) {
+	public function set($key, $value, $encrypt=false) {
+		$storageValue = $this->encrypt($value, $encrypt);
+
 		try {
-			$this->repository->set($key, $value);
+			$this->repository->set($key, $storageValue);
 		}
 		catch(\Exception $exception) {
 			throw new StoreException('An error occured while setting key/value pair : '.$key, 0, $exception);
@@ -37,15 +53,19 @@ class Store {
 
 	/**
 	 * @param $key
+	 * @param bool $decrypt
 	 * @return mixed
 	 * @throws KeyNotFoundException
 	 * @throws StoreException
 	 */
-	public function get($key) {
+	public function get($key, $decrypt=false) {
 		try {
-			return $this->repository->get($key);
+			return $this->decrypt($this->repository->get($key), $decrypt);
 		}
 		catch(KeyNotFoundException $exception) {
+			throw $exception;
+		}
+		catch(EncryptionException $exception) {
 			throw $exception;
 		}
 		catch(\Exception $exception) {
@@ -86,6 +106,42 @@ class Store {
 		}
 		catch(\Exception $exception) {
 			throw new StoreException('An error occured while verifying if key exists : '.$key, 0, $exception);
+		}
+	}
+
+	private function encrypt($value, $encrypt) {
+		if($encrypt) {
+			if(!$this->encryptionService) {
+				throw new EncryptionException('No encryption service specified');
+			}
+
+			try {
+				return $this->encryptionService->encrypt($value);
+			}
+			catch(\Exception $exception) {
+				throw new EncryptionException('An error occured while encrypting value', 0, $exception);
+			}
+		}
+		else {
+			return $value;
+		}
+	}
+
+	private function decrypt($value, $decrypt) {
+		if($decrypt) {
+			if(!$this->encryptionService) {
+				throw new EncryptionException('No encryption service specified');
+			}
+
+			try {
+				return $this->encryptionService->decrypt($value);
+			}
+			catch(\Exception $exception) {
+				throw new EncryptionException('An error occured while decrypting value', 0, $exception);
+			}
+		}
+		else {
+			return $value;
 		}
 	}
 }

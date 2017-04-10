@@ -2,6 +2,8 @@
 
 namespace Kronos\Keystore\Exception;
 
-class KeyNotFoundException extends \Exception {
+use Kronos\Keystore\Exception;
+
+class KeyNotFoundException extends Exception {
 
 }
