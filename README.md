@@ -1,2 +1,2 @@
 # keystore
-Simple key/value storage librairy
+Simple key/value storage library
