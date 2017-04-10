@@ -2,6 +2,11 @@
     "name": "kronos/keystore",
     "description": "Simple key/value storage librairy",
     "type": "library",
+    "autoload": {
+        "psr-4": {
+            "Kronos\\Keystore\\": "src/Kronos/Keystore"
+        }
+    },
     "require": {
         "kronos/encrypt": "^0.1.0"
     },
