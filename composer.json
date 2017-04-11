@@ -7,6 +7,11 @@
             "Kronos\\Keystore\\": "src/Kronos/Keystore"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Kronos\\Tests\\Keystore\\": "tests/Kronos/Tests/Keystore"
+        }
+    },
     "require-dev": {
         "phpunit/phpunit": "^5.7"
     },

@@ -6,8 +6,7 @@
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	syntaxCheck="false"
-bootstrap="./tests/bootstrap.php"
-verbose="true"
+	verbose="true"
 >
 <testsuites>
 	<testsuite name="Kronos-Log">
