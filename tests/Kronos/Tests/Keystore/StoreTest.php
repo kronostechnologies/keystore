@@ -214,7 +214,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 			->method('get')
 			->with(self::KEY);
 
-		$this->store->exists(self::KEY);
+		$this->store->has(self::KEY);
 	}
 
 	public function test_ValueReturned_exists_ShouldReturnTrue() {
@@ -222,7 +222,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 			->method('get')
 			->willReturn(self::VALUE);
 
-		$value = $this->store->exists(self::KEY);
+		$value = $this->store->has(self::KEY);
 
 		$this->assertTrue($value);
 	}
@@ -232,7 +232,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 			->method('get')
 			->willThrowException(new KeyNotFoundException());
 
-		$value = $this->store->exists(self::KEY);
+		$value = $this->store->has(self::KEY);
 
 		$this->assertFalse($value);
 	}
@@ -243,7 +243,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 			->willThrowException(new \Exception());
 		$this->expectException(StoreException::class);
 
-		$this->store->exists(self::KEY);
+		$this->store->has(self::KEY);
 	}
 
 	private function givenEncryptionService() {

@@ -97,7 +97,7 @@ class Store {
 	 * @return bool
 	 * @throws StoreException
 	 */
-	public function exists($key) {
+	public function has($key) {
 		try {
 			$this->repository->get($key);
 			return true;
