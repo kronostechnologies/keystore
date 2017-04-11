@@ -7,9 +7,6 @@
             "Kronos\\Keystore\\": "src/Kronos/Keystore"
         }
     },
-    "require": {
-        "kronos/encrypt": "^0.1.0"
-    },
     "require-dev": {
         "phpunit/phpunit": "^5.7"
     },
