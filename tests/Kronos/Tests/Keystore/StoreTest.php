@@ -64,7 +64,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->store->set(self::KEY, self::VALUE, true);
 	}
 
-	public function test_EncryptionServiceAndEncrypt_set_ShoulSetEncryptedValue() {
+	public function test_EncryptionServiceAndEncrypt_set_ShoulSetBase64EncodedEncryptedValue() {
 		$this->givenEncryptionService();
 		$this->encryptionService
 			->method('encrypt')
@@ -72,7 +72,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->repository
 			->expects(self::once())
 			->method('set')
-			->with(self::KEY, self::ENCRYPTED_VALUE);
+			->with(self::KEY, base64_encode(self::ENCRYPTED_VALUE));
 
 		$this->store->set(self::KEY, self::VALUE, true);
 	}
@@ -116,7 +116,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 
 	public function test_EncryptionServiceAndDecrypt_get_ShouldCallDecrypt() {
 		$this->givenEncryptionService();
-		$this->givenRepositoryReturnEncryptedValue();
+		$this->givenRepositoryReturnBase64EncodedEncryptedValue();
 		$this->encryptionService
 			->expects(self::once())
 			->method('decrypt')
@@ -251,9 +251,9 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->store->setEncryptionService($this->encryptionService);
 	}
 
-	private function givenRepositoryReturnEncryptedValue() {
+	private function givenRepositoryReturnBase64EncodedEncryptedValue() {
 		$this->repository
 			->method('get')
-			->willReturn(self::ENCRYPTED_VALUE);
+			->willReturn(base64_encode(self::ENCRYPTED_VALUE));
 	}
 }

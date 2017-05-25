@@ -123,7 +123,7 @@ class Store {
 			}
 
 			try {
-				return $this->encryptionService->encrypt($value);
+				return base64_encode($this->encryptionService->encrypt($value));
 			}
 			catch(\Exception $exception) {
 				throw new EncryptionException('An error occured while encrypting value', 0, $exception);
@@ -147,7 +147,7 @@ class Store {
 			}
 
 			try {
-				return $this->encryptionService->decrypt($value);
+				return $this->encryptionService->decrypt(base64_decode($value));
 			}
 			catch(\Exception $exception) {
 				throw new EncryptionException('An error occured while decrypting value', 0, $exception);
