@@ -23,6 +23,9 @@ class Factory {
 		return $store;
 	}
 
+	/**
+	 * @return Encryption\FakeService
+	 */
 	public function createFakeEncryptionService() {
 		return new Encryption\FakeService();
 	}

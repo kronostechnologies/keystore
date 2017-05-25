@@ -28,7 +28,7 @@ class Store {
 	}
 
 	/**
-	 * @param EncryptionServiceInterface $encryptionService
+	 * @param Encryption\ServiceInterface $encryptionService
 	 */
 	public function setEncryptionService($encryptionService) {
 		$this->encryptionService = $encryptionService;
