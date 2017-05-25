@@ -1,10 +1,10 @@
 <?php
 
-namespace Kronos\Keystore;
+namespace Kronos\Keystore\Encryption;
 
 use Kronos\Keystore\Exception\EncryptionException;
 
-interface EncryptionServiceInterface {
+interface ServiceInterface {
 
 	/**
 	 * @param mixed $value

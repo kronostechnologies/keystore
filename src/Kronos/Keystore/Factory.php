@@ -5,21 +5,25 @@ namespace Kronos\Keystore;
 class Factory {
 
 	/**
-	 * @param RepositoryInterface $repository
+	 * @param Repository\RepositoryInterface $repository
 	 * @return Store
 	 */
-	public function createStore(RepositoryInterface $repository) {
+	public function createStore(Repository\RepositoryInterface $repository) {
 		return new Store($repository);
 	}
 
 	/**
-	 * @param RepositoryInterface $repository
-	 * @param EncryptionServiceInterface $encryptionService
+	 * @param Repository\RepositoryInterface $repository
+	 * @param Encryption\ServiceInterface $encryptionService
 	 * @return Store
 	 */
-	public function createStoreWithEncryption(RepositoryInterface $repository, EncryptionServiceInterface $encryptionService) {
+	public function createStoreWithEncryption(Repository\RepositoryInterface $repository, Encryption\ServiceInterface $encryptionService) {
 		$store = $this->createStore($repository);
 		$store->setEncryptionService($encryptionService);
 		return $store;
+	}
+
+	public function createFakeEncryptionService() {
+		return new Encryption\FakeService();
 	}
 }

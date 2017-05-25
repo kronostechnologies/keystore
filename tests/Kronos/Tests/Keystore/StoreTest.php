@@ -2,7 +2,7 @@
 
 namespace Kronos\Tests\Keystore;
 
-use Kronos\Keystore\EncryptionServiceInterface;
+use Kronos\Keystore\Encryption\ServiceInterface;
 use Kronos\Keystore\Exception\EncryptionException;
 use Kronos\Keystore\Exception\KeyNotFoundException;
 use Kronos\Keystore\Exception\StoreException;
@@ -247,7 +247,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	private function givenEncryptionService() {
-		$this->encryptionService = $this->createMock(EncryptionServiceInterface::class);
+		$this->encryptionService = $this->createMock(ServiceInterface::class);
 		$this->store->setEncryptionService($this->encryptionService);
 	}
 
