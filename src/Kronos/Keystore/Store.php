@@ -15,9 +15,14 @@ class Store {
 	private $repository;
 
 	/**
-	 * @var EncryptionServiceInterface
+	 * @var Encryption\ServiceInterface
 	 */
 	private $encryptionService;
+
+	/**
+	 * @var Cache\ServiceInterface
+	 */
+	private $cacheService;
 
 	/**
 	 * Store constructor.
@@ -35,6 +40,13 @@ class Store {
 	}
 
 	/**
+	 * @param Cache\ServiceInterface $cacheService
+	 */
+	public function setCacheService($cacheService) {
+		$this->cacheService = $cacheService;
+	}
+
+	/**
 	 * @param string $key
 	 * @param mixed $value
 	 * @param bool $encrypt
@@ -42,6 +54,8 @@ class Store {
 	 * @throws StoreException
 	 */
 	public function set($key, $value, $encrypt=false) {
+		$this->storeInCache($key, $value);
+
 		$storageValue = $this->encrypt($value, $encrypt);
 
 		try {
@@ -61,8 +75,19 @@ class Store {
 	 * @throws StoreException
 	 */
 	public function get($key, $decrypt=false) {
+		if($this->cacheService) {
+			try {
+				return $this->cacheService->get($key);
+			}
+			catch(KeyNotFoundException $exception) {
+				// Key not in cache, get from repository then
+			}
+		}
+
 		try {
-			return $this->decrypt($this->repository->get($key), $decrypt);
+			$value = $this->decrypt($this->repository->get($key), $decrypt);
+			$this->storeInCache($key, $value);
+			return $value;
 		}
 		catch(KeyNotFoundException $exception) {
 			throw $exception;
@@ -83,6 +108,10 @@ class Store {
 	public function delete($key) {
 		try {
 			$this->repository->delete($key);
+
+			if($this->cacheService) {
+				$this->cacheService->delete($key);
+			}
 		}
 		catch(KeyNotFoundException $exception) {
 			throw $exception;
@@ -155,6 +184,16 @@ class Store {
 		}
 		else {
 			return $value;
+		}
+	}
+
+	/**
+	 * @param $key
+	 * @param $value
+	 */
+	private function storeInCache($key, $value) {
+		if($this->cacheService) {
+			$this->cacheService->set($key, $value);
 		}
 	}
 }
