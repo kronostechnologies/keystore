@@ -16,8 +16,8 @@
         "phpunit/phpunit": "^5.7"
     },
     "suggest" : {
-        "kronos/keystore-dbal": "^0.1",
-        "kronos/keystore-encrypt": "^0.1"
+        "kronos/keystore-dbal": "^1.0.0",
+        "kronos/keystore-encrypt": "^1.0.0"
     },
     "license": "MIT"
 }
