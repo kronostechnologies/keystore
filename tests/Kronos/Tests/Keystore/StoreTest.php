@@ -29,6 +29,11 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 	 */
 	private $encryptionService;
 
+	/**
+	 * @var \PHPUnit_Framework_MockObject_MockObject
+	 */
+	private $cache;
+
 	public function setUp() {
 		$this->repository = $this->createMock(RepositoryInterface::class);
 
@@ -37,6 +42,16 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 
 	public function test_set_ShouldCallSetOnRepository() {
 		$this->repository
+			->expects(self::once())
+			->method('set')
+			->with(self::KEY, self::VALUE);
+
+		$this->store->set(self::KEY, self::VALUE);
+	}
+
+	public function test_Cache_set_ShouldCallSetOnCache() {
+		$this->givenCacheService();
+		$this->cache
 			->expects(self::once())
 			->method('set')
 			->with(self::KEY, self::VALUE);
@@ -114,6 +129,33 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame(self::VALUE, $value);
 	}
 
+	public function test_Cache_get_ShouldCallGetOnCacheAndReturnValue() {
+		$this->givenCacheService();
+		$this->cache
+			->expects(self::once())
+			->method('get')
+			->with(self::KEY)
+			->willReturn(self::VALUE);
+		$this->repository
+			->expects(self::never())
+			->method('get');
+
+		$value = $this->store->get(self::KEY);
+
+		$this->assertSame(self::VALUE, $value);
+	}
+
+	public function test_KeyNotInCache_get_ShouldCallGetOnRepository() {
+		$this->givenCacheService();
+		$this->givenKeyNotInCache();
+		$this->repository
+			->expects(self::once())
+			->method('get')
+			->with(self::KEY);
+
+		$this->store->get(self::KEY);
+	}
+
 	public function test_EncryptionServiceAndDecrypt_get_ShouldCallDecrypt() {
 		$this->givenEncryptionService();
 		$this->givenRepositoryReturnBase64EncodedEncryptedValue();
@@ -123,6 +165,20 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 			->with(self::ENCRYPTED_VALUE);
 
 		$this->store->get(self::KEY, true);
+	}
+
+	public function test_KeyNotInCache_get_ShouldStoreValueInCache() {
+		$this->givenCacheService();
+		$this->givenKeyNotInCache();
+		$this->repository
+			->method('get')
+			->willReturn(self::VALUE);
+		$this->cache
+			->expects(self::once())
+			->method('set')
+			->with(self::KEY, self::VALUE);
+
+		$this->store->get(self::KEY);
 	}
 
 	public function test_EncryptionServiceException_get_ShouldThrowEncryptionException() {
@@ -146,14 +202,38 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->assertSame(self::VALUE, $value);
 	}
 
+	public function test_KeyNotInCacheAndDecrypt_get_ShouldStoreDecryptedValueInCache() {
+		$this->givenCacheService();
+		$this->givenKeyNotInCache();
+		$this->givenEncryptionService();
+		$this->encryptionService
+			->method('decrypt')
+			->willReturn(self::VALUE);
+		$this->cache
+			->expects(self::once())
+			->method('set')
+			->with(self::KEY, self::VALUE);
+
+		$this->store->get(self::KEY, true);
+	}
+
 	public function test_EncryptionServiceAndDoNotDecrypt_get_ShouldNotDecrypt() {
 		$this->givenEncryptionService();
 		$this->encryptionService
 			->expects(self::never())
-			->method('decrypt')
-			->with(self::VALUE);
+			->method('decrypt');
 
 		$this->store->get(self::KEY);
+	}
+
+	public function test_InCacheAndEncryption_get_ShouldNotDecryptValue() {
+		$this->givenCacheService();
+		$this->givenEncryptionService();
+		$this->encryptionService
+			->expects(self::never())
+			->method('decrypt');
+
+		$this->store->get(self::KEY, true);
 	}
 
 	public function test_NoEncryptionServiceAndDecrypt_get_ShouldThrowEncryptionException() {
@@ -180,12 +260,22 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->store->get(self::KEY);
 	}
 
-	public function test_delete_ShouldCallUnsetOnRepository() {
+	public function test_delete_ShouldCallDeleteOnRepository() {
 		$this->repository
 			->expects(self::once())
 			->method('delete')
 			->with(self::KEY)
 			->willReturn(self::VALUE);
+
+		$this->store->delete(self::KEY);
+	}
+
+	public function test_Cache_delete_ShouldCallDeleteOnRepository() {
+		$this->givenCacheService();
+		$this->cache
+			->expects(self::once())
+			->method('delete')
+			->with(self::KEY);
 
 		$this->store->delete(self::KEY);
 	}
@@ -208,7 +298,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->store->delete(self::KEY);
 	}
 
-	public function test_exists_ShouldCallGetOnRespository() {
+	public function test_has_ShouldCallGetOnRespository() {
 		$this->repository
 			->expects(self::once())
 			->method('get')
@@ -217,7 +307,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->store->has(self::KEY);
 	}
 
-	public function test_ValueReturned_exists_ShouldReturnTrue() {
+	public function test_ValueReturned_has_ShouldReturnTrue() {
 		$this->repository
 			->method('get')
 			->willReturn(self::VALUE);
@@ -227,7 +317,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->assertTrue($value);
 	}
 
-	public function test_KeyNotFoundException_exists_ShouldReturnFalse() {
+	public function test_KeyNotFoundException_has_ShouldReturnFalse() {
 		$this->repository
 			->method('get')
 			->willThrowException(new KeyNotFoundException());
@@ -237,7 +327,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->assertFalse($value);
 	}
 
-	public function test_Exception_exists_ShouldThrowStoreException() {
+	public function test_Exception_has_ShouldThrowStoreException() {
 		$this->repository
 			->method('get')
 			->willThrowException(new \Exception());
@@ -255,5 +345,16 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->repository
 			->method('get')
 			->willReturn(base64_encode(self::ENCRYPTED_VALUE));
+	}
+
+	private function givenCacheService() {
+		$this->cache = $this->createMock(\Kronos\Keystore\Cache\ServiceInterface::class);
+		$this->store->setCacheService($this->cache);
+	}
+
+	private function givenKeyNotInCache() {
+		$this->cache
+			->method('get')
+			->willThrowException(new KeyNotFoundException());
 	}
 }

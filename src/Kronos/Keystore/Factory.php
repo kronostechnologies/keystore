@@ -29,4 +29,11 @@ class Factory {
 	public function createFakeEncryptionService() {
 		return new Encryption\FakeService();
 	}
+
+	/**
+	 * @return Cache\Memory
+	 */
+	public function createMemoryCache() {
+		return new Cache\Memory();
+	}
 }
