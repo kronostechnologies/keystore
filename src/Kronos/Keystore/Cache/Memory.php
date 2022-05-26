@@ -25,6 +25,8 @@ class Memory implements ServiceInterface {
 	/**
 	 * @param string $key
 	 * @param mixed $value
+	 *
+	 * @return void
 	 */
 	public function set($key, $value) {
 		$this->cache[$key] = $value;
@@ -32,6 +34,8 @@ class Memory implements ServiceInterface {
 
 	/**
 	 * @param string $key
+	 *
+	 * @return void
 	 */
 	public function delete($key) {
 		if(isset($this->cache[$key])) {

@@ -3,8 +3,9 @@
 namespace Kronos\Tests\Keystore\Encryption;
 
 use Kronos\Keystore\Encryption\FakeService;
+use PHPUnit\Framework\TestCase;
 
-class FakeServiceTest extends \PHPUnit_Framework_TestCase {
+class FakeServiceTest extends TestCase {
 	const VALUE = 'value';
 
 	/**
@@ -12,7 +13,7 @@ class FakeServiceTest extends \PHPUnit_Framework_TestCase {
 	 */
 	private $service;
 
-	public function setUp() {
+    protected function setUp(): void {
 		$this->service = new FakeService();
 	}
 
