@@ -13,7 +13,7 @@ class FakeServiceTest extends TestCase {
 	 */
 	private $service;
 
-    protected function setUp(): void {
+	protected function setUp(): void {
 		$this->service = new FakeService();
 	}
 

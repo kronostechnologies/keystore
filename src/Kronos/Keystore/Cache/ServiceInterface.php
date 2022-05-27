@@ -20,12 +20,12 @@ interface ServiceInterface {
 	 * @param string $key
 	 * @param mixed $value
 	 */
-	public function set($key, $value);
+	public function set($key, $value): void;
 
 	/**
 	 * Remove key from cache
 	 *
 	 * @param string $key
 	 */
-	public function delete($key);
+	public function delete($key): void;
 }

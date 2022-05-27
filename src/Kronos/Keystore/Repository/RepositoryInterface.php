@@ -9,7 +9,7 @@ interface RepositoryInterface {
 	 * @param string $key
 	 * @param mixed $value
 	 */
-	public function set($key, $value);
+	public function set($key, $value): void;
 
 	/**
 	 * @param string $key
@@ -22,5 +22,5 @@ interface RepositoryInterface {
 	 * @param string $key
 	 * @throws KeyNotFoundException
 	 */
-	public function delete($key);
+	public function delete($key): void;
 }

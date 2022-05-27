@@ -9,8 +9,8 @@ use Kronos\Keystore\Repository\RepositoryInterface;
 
 class Store {
 	private RepositoryInterface $repository;
-	private Encryption\ServiceInterface $encryptionService;
-	private Cache\ServiceInterface $cacheService;
+	private ?Encryption\ServiceInterface $encryptionService = null;
+	private ?Cache\ServiceInterface $cacheService = null;
 
 	public function __construct(RepositoryInterface $repository) {
 		$this->repository = $repository;
@@ -88,7 +88,6 @@ class Store {
 		try {
 			$this->repository->delete($key);
 
-            /** @psalm-suppress RedundantPropertyInitializationCheck */
 			if(isset($this->cacheService)) {
 				$this->cacheService->delete($key);
 			}
@@ -127,18 +126,17 @@ class Store {
 	 */
 	private function encrypt($value, $encrypt) {
 		if($encrypt) {
-            /** @psalm-suppress RedundantPropertyInitializationCheck */
 			if(!isset($this->encryptionService)) {
 				throw new EncryptionException('No encryption service specified');
 			}
 
 			try {
-                $encryptedValue = $this->encryptionService->encrypt($value);
-                if ($encryptedValue) {
-                    return base64_encode($encryptedValue);
-                }
+                		$encryptedValue = $this->encryptionService->encrypt($value);
+                		if ($encryptedValue) {
+                    			return base64_encode($encryptedValue);
+                		}
 
-                return null;
+                		return "";
 			}
 			catch(\Exception $exception) {
 				throw new EncryptionException('An error occured while encrypting value', 0, $exception);
@@ -157,17 +155,16 @@ class Store {
 	 */
 	private function decrypt($value, $decrypt) {
 		if($decrypt) {
-            /** @psalm-suppress RedundantPropertyInitializationCheck */
 			if(!isset($this->encryptionService)) {
 				throw new EncryptionException('No encryption service specified');
 			}
 
 			try {
-                if ($value) {
-                    return $this->encryptionService->decrypt(base64_decode($value));
-                }
+                		if ($value) {
+                    			return $this->encryptionService->decrypt(base64_decode($value));
+                		}
 
-                return null;
+                		return "";
 			}
 			catch(\Exception $exception) {
 				throw new EncryptionException('An error occured while decrypting value', 0, $exception);
@@ -183,7 +180,6 @@ class Store {
 	 * @param $value
 	 */
 	private function storeInCache(string $key, $value): void {
-        /** @psalm-suppress RedundantPropertyInitializationCheck */
 		if(isset($this->cacheService)) {
 			$this->cacheService->set($key, $value);
 		}

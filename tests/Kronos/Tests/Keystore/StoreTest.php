@@ -36,7 +36,7 @@ class StoreTest extends TestCase {
 	 */
 	private $cache;
 
-    protected function setUp(): void {
+	protected function setUp(): void {
 		$this->repository = $this->createMock(RepositoryInterface::class);
 
 		$this->store = new Store($this->repository);
@@ -185,9 +185,9 @@ class StoreTest extends TestCase {
 
 	public function test_EncryptionServiceException_get_ShouldThrowEncryptionException() {
 		$this->givenEncryptionService();
-        $this->repository
-            ->method('get')
-            ->willReturn(self::VALUE);
+        	$this->repository
+            		->method('get')
+            		->willReturn(self::VALUE);
 		$this->encryptionService
 			->method('decrypt')
 			->willThrowException(new \Exception());
@@ -198,9 +198,9 @@ class StoreTest extends TestCase {
 
 	public function test_EncryptionServiceAndDecrypt_get_ShoulReturnDecryptedValue() {
 		$this->givenEncryptionService();
-        $this->repository
-            ->method('get')
-            ->willReturn(self::KEY);
+        	$this->repository
+            		->method('get')
+            		->willReturn(self::KEY);
 		$this->encryptionService
 			->method('decrypt')
 			->willReturn(self::VALUE);
@@ -214,9 +214,9 @@ class StoreTest extends TestCase {
 		$this->givenCacheService();
 		$this->givenKeyNotInCache();
 		$this->givenEncryptionService();
-        $this->repository
-            ->method('get')
-            ->willReturn(self::KEY);
+        	$this->repository
+            		->method('get')
+            		->willReturn(self::KEY);
 		$this->encryptionService
 			->method('decrypt')
 			->willReturn(self::VALUE);
@@ -275,8 +275,7 @@ class StoreTest extends TestCase {
 		$this->repository
 			->expects(self::once())
 			->method('delete')
-			->with(self::KEY)
-			->willReturn(self::VALUE);
+			->with(self::KEY);
 
 		$this->store->delete(self::KEY);
 	}

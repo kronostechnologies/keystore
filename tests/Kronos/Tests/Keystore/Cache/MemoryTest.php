@@ -16,7 +16,7 @@ class MemoryTest extends TestCase {
 	 */
 	private $cache;
 
-    protected function setUp(): void {
+   	protected function setUp(): void {
 		$this->cache = new Memory();
 	}
 
