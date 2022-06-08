@@ -8,41 +8,19 @@ use Kronos\Keystore\Exception\StoreException;
 use Kronos\Keystore\Repository\RepositoryInterface;
 
 class Store {
+	private RepositoryInterface $repository;
+	private ?Encryption\ServiceInterface $encryptionService = null;
+	private ?Cache\ServiceInterface $cacheService = null;
 
-	/**
-	 * @var RepositoryInterface
-	 */
-	private $repository;
-
-	/**
-	 * @var Encryption\ServiceInterface
-	 */
-	private $encryptionService;
-
-	/**
-	 * @var Cache\ServiceInterface
-	 */
-	private $cacheService;
-
-	/**
-	 * Store constructor.
-	 * @param RepositoryInterface $repository
-	 */
 	public function __construct(RepositoryInterface $repository) {
 		$this->repository = $repository;
 	}
 
-	/**
-	 * @param Encryption\ServiceInterface $encryptionService
-	 */
-	public function setEncryptionService($encryptionService) {
+	public function setEncryptionService(Encryption\ServiceInterface $encryptionService): void {
 		$this->encryptionService = $encryptionService;
 	}
 
-	/**
-	 * @param Cache\ServiceInterface $cacheService
-	 */
-	public function setCacheService($cacheService) {
+	public function setCacheService(Cache\ServiceInterface $cacheService): void {
 		$this->cacheService = $cacheService;
 	}
 
@@ -53,7 +31,7 @@ class Store {
 	 * @throws EncryptionException
 	 * @throws StoreException
 	 */
-	public function set($key, $value, $encrypt=false) {
+	public function set($key, $value, $encrypt=false): void {
 		$this->storeInCache($key, $value);
 
 		$storageValue = $this->encrypt($value, $encrypt);
@@ -75,7 +53,7 @@ class Store {
 	 * @throws StoreException
 	 */
 	public function get($key, $decrypt=false) {
-		if($this->cacheService) {
+		if(isset($this->cacheService)) {
 			try {
 				return $this->cacheService->get($key);
 			}
@@ -102,14 +80,15 @@ class Store {
 
 	/**
 	 * @param string $key
+	 *
 	 * @throws KeyNotFoundException
 	 * @throws StoreException
 	 */
-	public function delete($key) {
+	public function delete($key): void {
 		try {
 			$this->repository->delete($key);
 
-			if($this->cacheService) {
+			if(isset($this->cacheService)) {
 				$this->cacheService->delete($key);
 			}
 		}
@@ -147,12 +126,17 @@ class Store {
 	 */
 	private function encrypt($value, $encrypt) {
 		if($encrypt) {
-			if(!$this->encryptionService) {
+			if(!isset($this->encryptionService)) {
 				throw new EncryptionException('No encryption service specified');
 			}
 
 			try {
-				return base64_encode($this->encryptionService->encrypt($value));
+                		$encryptedValue = $this->encryptionService->encrypt($value);
+                		if ($encryptedValue) {
+                    			return base64_encode($encryptedValue);
+                		}
+
+                		return "";
 			}
 			catch(\Exception $exception) {
 				throw new EncryptionException('An error occured while encrypting value', 0, $exception);
@@ -171,12 +155,16 @@ class Store {
 	 */
 	private function decrypt($value, $decrypt) {
 		if($decrypt) {
-			if(!$this->encryptionService) {
+			if(!isset($this->encryptionService)) {
 				throw new EncryptionException('No encryption service specified');
 			}
 
 			try {
-				return $this->encryptionService->decrypt(base64_decode($value));
+                		if ($value) {
+                    			return $this->encryptionService->decrypt(base64_decode($value));
+                		}
+
+                		return "";
 			}
 			catch(\Exception $exception) {
 				throw new EncryptionException('An error occured while decrypting value', 0, $exception);
@@ -191,8 +179,8 @@ class Store {
 	 * @param $key
 	 * @param $value
 	 */
-	private function storeInCache($key, $value) {
-		if($this->cacheService) {
+	private function storeInCache(string $key, $value): void {
+		if(isset($this->cacheService)) {
 			$this->cacheService->set($key, $value);
 		}
 	}

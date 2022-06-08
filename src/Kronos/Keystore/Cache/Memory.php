@@ -6,7 +6,7 @@ use Kronos\Keystore\Exception;
 
 class Memory implements ServiceInterface {
 
-	private $cache = [];
+	private array $cache = [];
 
 	/**
 	 * @param string $key
@@ -26,14 +26,14 @@ class Memory implements ServiceInterface {
 	 * @param string $key
 	 * @param mixed $value
 	 */
-	public function set($key, $value) {
+	public function set($key, $value): void {
 		$this->cache[$key] = $value;
 	}
 
 	/**
 	 * @param string $key
 	 */
-	public function delete($key) {
+	public function delete($key): void {
 		if(isset($this->cache[$key])) {
 			unset($this->cache[$key]);
 		}

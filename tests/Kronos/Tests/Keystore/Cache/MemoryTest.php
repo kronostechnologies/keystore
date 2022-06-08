@@ -4,8 +4,9 @@ namespace Kronos\Tests\Keystore\Cache;
 
 use Kronos\Keystore\Cache\Memory;
 use Kronos\Keystore\Exception;
+use PHPUnit\Framework\TestCase;
 
-class MemoryTest extends \PHPUnit_Framework_TestCase {
+class MemoryTest extends TestCase {
 	const KEY = 'key';
 	const VALUE = 'value';
 	const LAST_VALUE = 'last_value';
@@ -15,7 +16,7 @@ class MemoryTest extends \PHPUnit_Framework_TestCase {
 	 */
 	private $cache;
 
-	public function setUp() {
+   	protected function setUp(): void {
 		$this->cache = new Memory();
 	}
 

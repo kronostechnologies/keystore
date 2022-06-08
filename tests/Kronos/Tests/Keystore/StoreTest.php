@@ -8,8 +8,10 @@ use Kronos\Keystore\Exception\KeyNotFoundException;
 use Kronos\Keystore\Exception\StoreException;
 use Kronos\Keystore\Repository\RepositoryInterface;
 use Kronos\Keystore\Store;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class StoreTest extends \PHPUnit_Framework_TestCase {
+class StoreTest extends TestCase {
 	const KEY = 'key';
 	const VALUE = 'value';
 	const ENCRYPTED_VALUE = 'encrypted value';
@@ -20,21 +22,21 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 	private $store;
 
 	/**
-	 * @var \PHPUnit_Framework_MockObject_MockObject
+	 * @var MockObject
 	 */
 	private $repository;
 
 	/**
-	 * @var \PHPUnit_Framework_MockObject_MockObject
+	 * @var MockObject
 	 */
 	private $encryptionService;
 
 	/**
-	 * @var \PHPUnit_Framework_MockObject_MockObject
+	 * @var MockObject
 	 */
 	private $cache;
 
-	public function setUp() {
+	protected function setUp(): void {
 		$this->repository = $this->createMock(RepositoryInterface::class);
 
 		$this->store = new Store($this->repository);
@@ -183,6 +185,9 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 
 	public function test_EncryptionServiceException_get_ShouldThrowEncryptionException() {
 		$this->givenEncryptionService();
+        	$this->repository
+            		->method('get')
+            		->willReturn(self::VALUE);
 		$this->encryptionService
 			->method('decrypt')
 			->willThrowException(new \Exception());
@@ -193,6 +198,9 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 
 	public function test_EncryptionServiceAndDecrypt_get_ShoulReturnDecryptedValue() {
 		$this->givenEncryptionService();
+        	$this->repository
+            		->method('get')
+            		->willReturn(self::KEY);
 		$this->encryptionService
 			->method('decrypt')
 			->willReturn(self::VALUE);
@@ -206,6 +214,9 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->givenCacheService();
 		$this->givenKeyNotInCache();
 		$this->givenEncryptionService();
+        	$this->repository
+            		->method('get')
+            		->willReturn(self::KEY);
 		$this->encryptionService
 			->method('decrypt')
 			->willReturn(self::VALUE);
@@ -264,8 +275,7 @@ class StoreTest extends \PHPUnit_Framework_TestCase {
 		$this->repository
 			->expects(self::once())
 			->method('delete')
-			->with(self::KEY)
-			->willReturn(self::VALUE);
+			->with(self::KEY);
 
 		$this->store->delete(self::KEY);
 	}

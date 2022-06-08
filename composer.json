@@ -12,8 +12,12 @@
             "Kronos\\Tests\\Keystore\\": "tests/Kronos/Tests/Keystore"
         }
     },
+    "require": {
+      "php": "^7.4 || ^8.1"
+    },
     "require-dev": {
-        "phpunit/phpunit": "^5.7"
+        "phpunit/phpunit": "9.5.20",
+        "vimeo/psalm": "4.23.0"
     },
     "suggest" : {
         "kronos/keystore-dbal": "^1.0.0",
